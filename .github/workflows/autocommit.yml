@@ -3,7 +3,7 @@ name: Auto Commit
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 */12 * * *'
+    - cron: '0 12 * * *'
 
 jobs:
   auto_commit:
@@ -12,16 +12,17 @@ jobs:
       contents: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Modify file
         run: |
-          echo "Last updated: $(date)" > last_updated.txt
+          echo "Last updated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" > last_updated.txt
 
-      - name: Commit changes
+      - name: Commit and push
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git config user.name 'dhivagar29'
+          git config user.email 'dhivagar29@users.noreply.github.com'
           git add last_updated.txt
-          git commit -m "Automated commit"
+          git diff --staged --quiet && echo "No changes to commit" && exit 0
+          git commit -m "Daily activity commit - $(date -u '+%Y-%m-%d')"
           git push
